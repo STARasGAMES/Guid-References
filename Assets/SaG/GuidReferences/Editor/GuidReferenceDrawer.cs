@@ -53,7 +53,7 @@ namespace SaG.GuidReferences.Editor
             }
 
             currentGuid = new System.Guid(byteArray);
-            currentGO = GuidManager.ResolveGuid(currentGuid);
+            currentGO = GuidManagerSingleton.ResolveGuid(currentGuid);
             GuidComponent currentGuidComponent = currentGO != null ? currentGO.GetComponent<GuidComponent>() : null;
 
             GuidComponent component = null;

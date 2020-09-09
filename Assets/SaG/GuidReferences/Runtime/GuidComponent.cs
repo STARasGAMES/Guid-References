@@ -67,7 +67,7 @@ namespace SaG.GuidReferences
             // register with the GUID Manager so that other components can access this
             if (guid != System.Guid.Empty)
             {
-                if (!GuidManager.Add(this))
+                if (!GuidManagerSingleton.Add(this))
                 {
                     // if registration fails, we probably have a duplicate or invalid GUID, get us a new one.
                     RegenerateGuid();
@@ -182,7 +182,7 @@ namespace SaG.GuidReferences
         // let the manager know we are gone, so other objects no longer find this
         public void OnDestroy()
         {
-            GuidManager.Remove(guid);
+            GuidManagerSingleton.Remove(guid);
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace SaG.GuidReferences
         /// </summary>
         public void RegenerateGuid()
         {
-            GuidManager.Remove(guid);
+            GuidManagerSingleton.Remove(guid);
             serializedGuid = null;
             guid = System.Guid.Empty;
             cachedStringGuid = null;
@@ -208,17 +208,17 @@ namespace SaG.GuidReferences
             if (IsGuidAssigned())
             {
                 oldGuid = guid;
-                GuidManager.Remove(guid);
+                GuidManagerSingleton.Remove(guid);
             }
 
             guid = value;
-            if (!GuidManager.Add(this))
+            if (!GuidManagerSingleton.Add(this))
             {
                 Debug.LogError($"Trying to set invalid guid: {value}. Previous guid restored.");
                 if (oldGuid.HasValue)
                 {
                     guid = oldGuid.Value;
-                    GuidManager.Add(this);
+                    GuidManagerSingleton.Add(this);
                 }
             }
         }

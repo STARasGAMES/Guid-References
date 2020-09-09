@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/SaG/GuidReferences/Samples/CrossSceneReferenceSample/LoadFirst.unity
+    guid: 6f8ba3c4c3bf19d4999033b50832272b
+  - enabled: 1
+    path: Assets/SaG/GuidReferences/Samples/CrossSceneReferenceSample/LoadSecond.unity
+    guid: 8acfd1b1a375f2049a2dde40d955ce3f
   m_configObjects: {}
