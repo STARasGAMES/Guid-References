@@ -12,7 +12,7 @@ namespace SaG.GuidReferences.Samples
         void Awake()
         {
             // set up a callback when the target is destroyed so we can remove references to the destroyed object
-            crossSceneReference.GuidRemoved += ClearCache;
+            crossSceneReference.Removed += ClearCache;
         }
 
         void Update () 
