@@ -47,9 +47,9 @@ namespace SaG.GuidReferences
         }
 
         /// <summary>Initializes a new instance of the <see cref="GuidReference"/> class.</summary>
-        public GuidReference(GuidComponent target)
+        public GuidReference(Guid guid)
         {
-            guid = target.GetGuid();
+            this.guid = guid;
             addDelegate = OnGuidAdded;
             removeDelegate = OnGuidRemoved;
         }

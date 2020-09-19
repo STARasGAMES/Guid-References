@@ -10,12 +10,12 @@ namespace SaG.GuidReferences
     {
         private static IGuidManager _instance = null;
         // Singleton interface
-        private static IGuidManager Instance => _instance ?? (_instance = new GuidManager());
+        public static IGuidManager Instance => _instance ?? (_instance = new GuidManager());
         
         // All the public API is static so you need not worry about creating an instance
-        public static bool Add(GuidComponent guidComponent )
+        public static bool Add(Guid guid, GameObject gameObject)
         {
-            return Instance.Add(guidComponent);
+            return Instance.Add(guid, gameObject);
         }
 
         public static bool Remove(Guid guid)
