@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
 
 namespace SaG.GuidReferences.Tests.Editor
@@ -28,79 +26,88 @@ namespace SaG.GuidReferences.Tests.Editor
         }
 
         [Test]
-        public void Add_ThrowsArgumentNullException_WhenProvideNullArgument()
+        public void Add_ThrowsArgumentNullException_WhenProvideNullGameObject()
         {
-            Assert.Throws<ArgumentNullException>(() => guidManager.Add(null));
+            Assert.Throws<ArgumentNullException>(() => guidManager.Add(Guid.NewGuid(), null));
+        }
+        
+        [Test]
+        public void Add_ThrowsArgumentNullException_WhenProvideEmptyGuid()
+        {
+            Assert.Throws<ArgumentNullException>(() => guidManager.Add(Guid.Empty, new GameObject("Add_ThrowsArgumentNullException_WhenProvideEmptyGuid")));
         }
 
         [Test]
-        public void Add_ThrowsMissingReferenceException_WhenProvideDestroyedGameObject()
+        public void Add_ThrowsArgumentNullException_WhenProvideDestroyedGameObject()
         {
-            var guidComponent = GuidComponentTests.CreateNewGuid();
-            Object.DestroyImmediate(guidComponent.gameObject);
-            Assert.Throws<MissingReferenceException>(() => guidManager.Add(guidComponent));
+            var guid = Guid.NewGuid();
+            var gameObject = new GameObject("GuidManagerTests GO");
+            Object.DestroyImmediate(gameObject);
+            Assert.Throws<ArgumentNullException>(() => guidManager.Add(guid, gameObject));
         }
 
         [Test]
         public void Add_ReturnsTrue_WhenProvideValidGuidComponent()
         {
-            var guidComponent = GuidComponentTests.CreateNewGuid();
-            Assert.IsTrue(guidManager.Add(guidComponent));
+            var guid = Guid.NewGuid();
+            var gameObject = new GameObject("GuidManagerTests GO");
+            Assert.IsTrue(guidManager.Add(guid, gameObject));
         }
 
         [Test]
         public void Add_ReturnsTrue_WhenProvideSameGuidComponentTwice()
         {
-            var guidComponent = GuidComponentTests.CreateNewGuid();
-            Assert.IsTrue(guidManager.Add(guidComponent));
-            Assert.IsTrue(guidManager.Add(guidComponent));
+            var guid = Guid.NewGuid();
+            var gameObject = new GameObject("GuidManagerTests GO");
+            Assert.IsTrue(guidManager.Add(guid, gameObject));
+            Assert.IsTrue(guidManager.Add(guid, gameObject));
         }
 
         [Test]
         public void Add_ReturnsFalse_WhenProvideGuidComponentsWithSameGuid()
         {
-            var guidComponent1 = GuidComponentTests.CreateNewGuid();
-            var guidComponent2 = GuidComponentTests.CreateNewGuid();
-            guidComponent2.SetGuid(guidComponent1.GetGuid());
-            Assert.IsTrue(guidManager.Add(guidComponent1));
-            Assert.IsFalse(guidManager.Add(guidComponent2));
+            var guid = Guid.NewGuid();
+            var gameObject1 = new GameObject("GuidManagerTests GO 1");
+            var gameObject2 = new GameObject("GuidManagerTests GO 2");
+            Assert.IsTrue(guidManager.Add(guid, gameObject1));
+            Assert.IsFalse(guidManager.Add(guid, gameObject2));
         }
-        
 
         [Test]
         public void Add_RaisesAddedCallback()
         {
-            var guidComponent = GuidComponentTests.CreateNewGuid();
-            guidManager.Add(guidComponent);
-            guidManager.Remove(guidComponent.GetGuid());
+            var guid = Guid.NewGuid();
+            var gameObject = new GameObject("GuidManagerTests GO");
             int addedCallbackRaiseCount = 0;
             GameObject addedCallbackResolveObject = null;
-            guidManager.ResolveGuid(guidComponent.GetGuid(), o =>
+            guidManager.ResolveGuid(guid, o =>
                 {
                     addedCallbackResolveObject = o;
                     addedCallbackRaiseCount++;
                 },
                 null);
-            guidManager.Add(guidComponent);
+            guidManager.Add(guid, gameObject);
             Assert.AreEqual(1, addedCallbackRaiseCount);
-            Assert.AreEqual(guidComponent.gameObject, addedCallbackResolveObject);
+            Assert.AreEqual(gameObject, addedCallbackResolveObject);
         }
         
         [Test]
         public void Remove_ReturnsTrue_WhenProvideValidGuid()
         {
-            var guidComponent = GuidComponentTests.CreateNewGuid();
-            guidManager.Add(guidComponent);
-            Assert.IsTrue(guidManager.Remove(guidComponent.GetGuid()));
+            var guid = Guid.NewGuid();
+            var gameObject = new GameObject("GuidManagerTests GO");
+            guidManager.Add(guid, gameObject);
+            Assert.IsTrue(guidManager.Remove(guid));
         }
 
         [Test]
         public void Remove_ReturnsFalse_WhenProvideSameGuidTwice()
         {
-            var guidComponent = GuidComponentTests.CreateNewGuid();
-            guidManager.Add(guidComponent);
-            guidManager.Remove(guidComponent.GetGuid());
-            Assert.IsFalse(guidManager.Remove(guidComponent.GetGuid()));
+            var guid = Guid.NewGuid();
+            var gameObject = new GameObject("GuidManagerTests GO");
+            guidManager.Add(guid, gameObject);
+            guidManager.Remove(guid);
+            Assert.IsFalse(guidManager.Remove(guid));
         }
 
         [Test]
@@ -118,25 +125,27 @@ namespace SaG.GuidReferences.Tests.Editor
         [Test]
         public void Remove_RaisesRemovedCallback()
         {
-            var guidComponent = GuidComponentTests.CreateNewGuid();
-            guidManager.Add(guidComponent);
+            var guid = Guid.NewGuid();
+            var gameObject = new GameObject("GuidManagerTests GO");
+            guidManager.Add(guid, gameObject);
             int removedCallbackRaiseCount = 0;
-            guidManager.ResolveGuid(guidComponent.GetGuid(), null,
+            guidManager.ResolveGuid(guid, null,
                 () =>
                 {
                     removedCallbackRaiseCount++;
                 });
-            guidManager.Remove(guidComponent.GetGuid());
+            guidManager.Remove(guid);
             Assert.AreEqual(1, removedCallbackRaiseCount);
         }
 
         [Test]
         public void ResolveGuid_Returns_WhenProvideValidGuid()
         {
-            var guidComponent = GuidComponentTests.CreateNewGuid();
-            guidManager.Add(guidComponent);
-            var resolveGuid = guidManager.ResolveGuid(guidComponent.GetGuid(), null, null);
-            Assert.AreEqual(guidComponent.gameObject, resolveGuid);
+            var guid = Guid.NewGuid();
+            var gameObject = new GameObject("GuidManagerTests GO");
+            guidManager.Add(guid, gameObject);
+            var resolveGuid = guidManager.ResolveGuid(guid, null, null);
+            Assert.AreEqual(gameObject, resolveGuid);
         }
 
         [Test]
@@ -148,10 +157,21 @@ namespace SaG.GuidReferences.Tests.Editor
         [Test]
         public void ResolveGuid_ReturnsNull_WhenProvideRemovedGuid()
         {
-            var guidComponent = GuidComponentTests.CreateNewGuid();
-            guidManager.Add(guidComponent);
-            guidManager.Remove(guidComponent.GetGuid());
-            Assert.IsNull(guidManager.ResolveGuid(guidComponent.GetGuid(), null, null));
+            var guid = Guid.NewGuid();
+            var gameObject = new GameObject("GuidManagerTests GO");
+            guidManager.Add(guid, gameObject);
+            guidManager.Remove(guid);
+            Assert.IsNull(guidManager.ResolveGuid(guid, null, null));
+        }
+        
+        [Test]
+        public void ResolveGuid_ReturnsNull_WhenGameObjectDestroyed()
+        {
+            var guid = Guid.NewGuid();
+            var gameObject = new GameObject("GuidManagerTests GO");
+            guidManager.Add(guid, gameObject);
+            Object.DestroyImmediate(gameObject);
+            Assert.IsTrue(guidManager.ResolveGuid(guid, null, null) == null); // unity's object check for null
         }
     }
 }

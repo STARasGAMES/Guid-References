@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -31,25 +30,29 @@ namespace SaG.GuidReferences.Tests.Editor
             guidPrefab = prefab.GetComponent<GuidComponent>();
         }
 
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            AssetDatabase.DeleteAsset(PrefabPath);
+        }
+        
         public static GuidComponent CreateNewGuid()
         {
             GameObject newGO = new GameObject("GuidTestGO");
             return newGO.AddComponent<GuidComponent>();
         }
-
-        [UnityTest]
-        public IEnumerator GetGuid_ReturnsUniqueGuid_WhenNewGameObjectCreated()
+        
+        [Test]
+        public void GetGuid_ReturnsUniqueGuid_WhenNewGameObjectCreated()
         {
             GuidComponent guid1 = guidBase;
             GuidComponent guid2 = CreateNewGuid();
 
             Assert.AreNotEqual(guid1.GetGuid(), guid2.GetGuid());
-
-            yield return null;
         }
 
-        [UnityTest]
-        public IEnumerator GetGuid_ReturnsUniqueGuid_WhenInstantiatedFromGameObject()
+        [Test]
+        public void GetGuid_ReturnsUniqueGuid_WhenInstantiatedFromGameObject()
         {
             LogAssert.Expect(LogType.Warning,
                 "Guid Collision Detected while creating GuidTestGO(Clone).\nAssigning new Guid.");
@@ -57,34 +60,32 @@ namespace SaG.GuidReferences.Tests.Editor
             GuidComponent clone = Object.Instantiate<GuidComponent>(guidBase);
 
             Assert.AreNotEqual(guidBase.GetGuid(), clone.GetGuid());
-
-            yield return null;
         }
 
-        [UnityTest]
-        public IEnumerator GetGuid_ReturnsEmptyGuid_WhenItIsPrefab()
+        [Test]
+        public void GetGuid_ReturnsEmptyGuid_WhenItIsPrefab()
         {
             Assert.AreNotEqual(guidBase.GetGuid(), guidPrefab.GetGuid());
             Assert.AreEqual(guidPrefab.GetGuid(), System.Guid.Empty);
-
-            yield return null;
         }
 
-        [UnityTest]
-        public IEnumerator GetGuid_ReturnsUniqueGuid_WhenInstantiatedFromPrefab()
+        [Test]
+        public void GetGuid_ReturnsUniqueGuid_WhenInstantiatedFromPrefab()
         {
             GuidComponent instance = Object.Instantiate<GuidComponent>(guidPrefab);
             Assert.AreNotEqual(guidBase.GetGuid(), instance.GetGuid());
             Assert.AreNotEqual(instance.GetGuid(), guidPrefab.GetGuid());
-
-            yield return null;
         }
 
-
-        [OneTimeTearDown]
-        public void TearDown()
+        [Test]
+        public void GuidComponent_RaisesRemovedCallback_WhenDestroyed()
         {
-            AssetDatabase.DeleteAsset(PrefabPath);
+            var guidComponent = CreateNewGuid();
+            int removeCallbackCount = 0;
+            GuidManagerSingleton.ResolveGuid(guidComponent.GetGuid(), () => removeCallbackCount++);
+            var guid = guidComponent.GetGuid();
+            Object.DestroyImmediate(guidComponent.gameObject);
+            Assert.AreEqual(1, removeCallbackCount);
         }
     }
 }

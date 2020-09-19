@@ -16,7 +16,7 @@ namespace SaG.GuidReferences
     public class GuidComponent : MonoBehaviour, ISerializationCallbackReceiver, IGuidProvider
     {
         // System guid we use for comparison and generation
-        System.Guid guid = System.Guid.Empty;
+        Guid guid = Guid.Empty;
         private string cachedStringGuid;
 
         // Unity's serialization system doesn't know about System.Guid, so we convert to a byte array
@@ -27,7 +27,7 @@ namespace SaG.GuidReferences
 
         public bool IsGuidAssigned()
         {
-            return guid != System.Guid.Empty;
+            return guid != Guid.Empty;
         }
 
 
@@ -46,7 +46,7 @@ namespace SaG.GuidReferences
                 }
                 Undo.RecordObject(this, "Added GUID");
 #endif
-                guid = System.Guid.NewGuid();
+                guid = Guid.NewGuid();
                 serializedGuid = guid.ToByteArray();
 
 #if UNITY_EDITOR
@@ -58,16 +58,16 @@ namespace SaG.GuidReferences
                 }
 #endif
             }
-            else if (guid == System.Guid.Empty)
+            else if (guid == Guid.Empty)
             {
                 // otherwise, we should set our system guid to our serialized guid
-                guid = new System.Guid(serializedGuid);
+                guid = new Guid(serializedGuid);
             }
 
             // register with the GUID Manager so that other components can access this
-            if (guid != System.Guid.Empty)
+            if (guid != Guid.Empty)
             {
-                if (!GuidManagerSingleton.Add(this))
+                if (!GuidManagerSingleton.Add(guid, gameObject))
                 {
                     // if registration fails, we probably have a duplicate or invalid GUID, get us a new one.
                     RegenerateGuid();
@@ -115,12 +115,12 @@ namespace SaG.GuidReferences
             if (IsAssetOnDisk())
             {
                 serializedGuid = null;
-                guid = System.Guid.Empty;
+                guid = Guid.Empty;
             }
             else
 #endif
             {
-                if (guid != System.Guid.Empty)
+                if (guid != Guid.Empty)
                 {
                     serializedGuid = guid.ToByteArray();
                 }
@@ -132,7 +132,7 @@ namespace SaG.GuidReferences
         {
             if (serializedGuid != null && serializedGuid.Length == 16)
             {
-                guid = new System.Guid(serializedGuid);
+                guid = new Guid(serializedGuid);
             }
         }
 
@@ -149,7 +149,7 @@ namespace SaG.GuidReferences
             if (IsAssetOnDisk())
             {
                 serializedGuid = null;
-                guid = System.Guid.Empty;
+                guid = Guid.Empty;
             }
             else
 #endif
@@ -159,11 +159,11 @@ namespace SaG.GuidReferences
         }
 
         // Never return an invalid GUID
-        public System.Guid GetGuid()
+        public Guid GetGuid()
         {
-            if (guid == System.Guid.Empty && serializedGuid != null && serializedGuid.Length == 16)
+            if (guid == Guid.Empty && serializedGuid != null && serializedGuid.Length == 16)
             {
-                guid = new System.Guid(serializedGuid);
+                guid = new Guid(serializedGuid);
             }
 
             return guid;
@@ -192,7 +192,7 @@ namespace SaG.GuidReferences
         {
             GuidManagerSingleton.Remove(guid);
             serializedGuid = null;
-            guid = System.Guid.Empty;
+            guid = Guid.Empty;
             cachedStringGuid = null;
             CreateGuid();
         }
@@ -212,13 +212,13 @@ namespace SaG.GuidReferences
             }
 
             guid = value;
-            if (!GuidManagerSingleton.Add(this))
+            if (!GuidManagerSingleton.Add(guid, gameObject))
             {
                 Debug.LogError($"Trying to set invalid guid: {value}. Previous guid restored.");
                 if (oldGuid.HasValue)
                 {
                     guid = oldGuid.Value;
-                    GuidManagerSingleton.Add(this);
+                    GuidManagerSingleton.Add(guid, gameObject);
                 }
             }
         }

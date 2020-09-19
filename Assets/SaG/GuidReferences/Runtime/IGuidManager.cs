@@ -5,7 +5,7 @@ namespace SaG.GuidReferences
 {
     public interface IGuidManager
     {
-        bool Add(GuidComponent guidComponent);
+        bool Add(Guid guid, GameObject gameObject);
 
         bool Remove(Guid guid);
 

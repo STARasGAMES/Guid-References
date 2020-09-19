@@ -23,6 +23,7 @@ namespace SaG.GuidReferences.Tests.Editor
         [Test]
         public void GuidReference_ReturnsNull_WhenGuidIsNotSet()
         {
+            guidManagerMock.ResolveGuidResult = null;
             GuidReference reference = new GuidReference();
             Assert.IsNull(reference.gameObject);
         }
@@ -31,7 +32,7 @@ namespace SaG.GuidReferences.Tests.Editor
         public void GuidReference_ReturnsNull_WhenTargetGameObjectDestroyed()
         {
             GuidComponent newGuid = GuidComponentTests.CreateNewGuid();
-            GuidReference reference = new GuidReference(newGuid);
+            GuidReference reference = new GuidReference(newGuid.GetGuid());
             // todo
             Object.DestroyImmediate(newGuid);
 
@@ -42,7 +43,7 @@ namespace SaG.GuidReferences.Tests.Editor
         public void GuidReference_ReturnsGameObject_WhenValidReference()
         {
             GuidComponent newGuid = GuidComponentTests.CreateNewGuid();
-            GuidReference reference = new GuidReference(newGuid);
+            GuidReference reference = new GuidReference(newGuid.GetGuid());
             guidManagerMock.ResolveGuidResult = newGuid.gameObject;
             Assert.AreEqual(newGuid.gameObject, reference.gameObject);
         }
@@ -51,7 +52,7 @@ namespace SaG.GuidReferences.Tests.Editor
         public void AddedEvent_Raises_WhenGuidAdded()
         {
             var guidComponent = GuidComponentTests.CreateNewGuid();
-            GuidReference reference = new GuidReference(guidComponent);
+            GuidReference reference = new GuidReference(guidComponent.GetGuid());
             int addedEventRaiseCount = 0;
             GameObject addedEventResult = null;
             reference.Added += gameObject =>
@@ -72,7 +73,7 @@ namespace SaG.GuidReferences.Tests.Editor
         public void RemovedEvent_Raises_WhenGuidRemoved()
         {
             var guidComponent = GuidComponentTests.CreateNewGuid();
-            GuidReference reference = new GuidReference(guidComponent);
+            GuidReference reference = new GuidReference(guidComponent.GetGuid());
             reference.RequestResolve();
             int eventRaiseCount = 0;
             reference.Removed += () => eventRaiseCount++;
