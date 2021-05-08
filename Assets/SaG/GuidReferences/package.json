@@ -1,10 +1,10 @@
 {
   "name": "com.sag.guid-references",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "displayName": "Guid References",
   "description": "This package provides easy to use API to generate GUIDs(Global Unique IDentifier) for GameObjects.",
   "unity": "2019.4",
-  "unityRelease": "8f1",
+  "unityRelease": "0f1",
   "dependencies": {
   },
   "keywords": [
@@ -12,8 +12,7 @@
   ],
   "author": {
     "name": "STARasGAMES",
-    "email": "doterpoter@gmail.com",
-    "url": "https://forum.unity.com/members/mugik.876562/"
+    "url": "https://github.com/STARasGAMES"
   },
   "samples": [
     {
